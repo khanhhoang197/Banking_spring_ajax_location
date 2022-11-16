@@ -1,0 +1,102 @@
+h1 {
+    color: white;
+}
+
+.head {
+    padding: 10px;
+    background-color: #2c3034;
+}
+
+.head .btn {
+    float: right;
+    min-width: 50px;
+    outline: none !important;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+header {
+    background-color: #0a8aca;
+    color: #fff;
+    padding: 15px;
+}
+
+header .btn {
+    float: right;
+    min-width: 50px;
+    outline: none !important;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 1px solid #fff;
+}
+
+table{
+    border: 1px solid black;
+}
+
+thead {
+    background-color: #087990;
+    color: white;
+}
+
+.modal-alert-danger {
+    padding: 10px 35px;
+    margin-bottom: 15px;
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+.modal-alert-danger label {
+    display: list-item;
+}
+
+.hide{
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+#modalCreateCustomer .modal-header{
+    background-color: #6c757d;
+    color: white;
+}
+
+#modalUpdateCustomer .modal-header{
+    background-color: #6c757d;
+    color: white;
+}
+
+#modalDeposit .modal-header{
+    background-color: #6c757d;
+    color: white;
+}
+
+#modalWithdraw .modal-header{
+    background-color: #6c757d;
+    color: white;
+}
+
+#modalTransfer .modal-header{
+    background-color: #6c757d;
+    color: white;
+}
+
+.modal-alert-danger {
+    padding: 10px 35px;
+    margin-bottom: 15px;
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+input:read-only {
+    background-color: #b0b5be;
+}
+input:read-only:focus{
+    background-color: #b0b5be;
+}
