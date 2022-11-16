@@ -645,13 +645,13 @@
             let id = $(this).data("id");
             page.commands.getCustomerById(id).then(() => {
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    title: 'Bạn có chắc muốn xóa?',
+                    text: "Bạn không thể hoàn tác khi xóa!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
+                    confirmButtonText: 'Có, xóa ngay!'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         page.commands.doDeleteCustomer(id)
@@ -782,7 +782,7 @@
 
                 Swal.fire(
                     'Thành công',
-                    "Nạp <b>'" + obj.transactionAmount + "'</b> VNĐ cho khách hàng <b>'" + customer.fullName + "'</b> thành công",
+                    "Nạp <b>'" + obj.transactionAmount + "'</b> vnđ cho khách hàng <b>'" + customer.fullName + "'</b> thành công",
                     'success'
                 )
             })
