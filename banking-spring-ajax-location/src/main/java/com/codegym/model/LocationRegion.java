@@ -52,4 +52,5 @@ public class LocationRegion extends BaseEntity {
                 .setWardName(wardName)
                 .setAddress(address);
     }
+
 }

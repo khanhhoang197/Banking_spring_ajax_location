@@ -9,11 +9,8 @@ import org.springframework.validation.FieldError;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 @Component
 public class AppUtils {
-
     public ResponseEntity<?> mapErrorToResponse(BindingResult result) {
         List<FieldError> fieldErrors = result.getFieldErrors();
         Map<String, String> errors = new HashMap<>();

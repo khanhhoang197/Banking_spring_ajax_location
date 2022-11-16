@@ -1,9 +1,11 @@
 package com.codegym.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
+@Accessors(chain = true)
 @Table(name = "deposits")
 public class Deposit extends BaseEntity {
     @Id

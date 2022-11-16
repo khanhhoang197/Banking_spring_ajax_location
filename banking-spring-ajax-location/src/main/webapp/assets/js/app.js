@@ -6,19 +6,30 @@ class App {
     static TRANSFER_API = this.DOMAIN_SERVER + "/api/transfers";
     static PROVINCE_URL = "https://vapi.vnappmob.com/api/province/";
 }
+
+class LocationRegion {
+    constructor(id, provinceId, provinceName, districtId, districtName, wardId, wardName, address) {
+        this.id = id;
+        this.provinceId = provinceId;
+        this.provinceName = provinceName;
+        this.districtId = districtId;
+        this.districtName = districtName;
+        this.wardId = wardId;
+        this.wardName = wardName;
+        this.address = address;
+    }
+}
+
 class Customer {
-    constructor(id, fullName, email, phone, address, balance, deleted) {
+    constructor(id, fullName, email, phone, locationRegion, balance) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
-        this.address = address;
+        this.locationRegion = locationRegion;
         this.balance = balance;
-        this.deleted = deleted;
     }
 }
-
-
 
 class Withdraw {
     constructor(id, customerId, transactionAmount) {
@@ -35,18 +46,6 @@ class Deposit {
         this.transactionAmount = transactionAmount;
     }
 }
-class LocationRegion {
-    constructor(id, provinceId, provinceName, districtId, districtName, wardId, wardName, address) {
-        this.id = id;
-        this.provinceId = provinceId;
-        this.provinceName = provinceName;
-        this.districtId = districtId;
-        this.districtName = districtName;
-        this.wardId = wardId;
-        this.wardName = wardName;
-        this.address = address;
-    }
-}
 
 class Transfer {
     constructor(id, senderId, transferAmount, fees, feesAmount, transactionAmount, recipientId) {
@@ -59,4 +58,3 @@ class Transfer {
         this.recipientId = recipientId;
     }
 }
-

@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.codegym</groupId>
-    <artifactId>spring-ajax-banking-location</artifactId>
+    <artifactId>banking-spring-ajax-location</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>spring-ajax-banking-location</name>
+    <name>banking-spring-ajax-location</name>
     <packaging>war</packaging>
 
     <properties>
@@ -67,6 +67,11 @@
             <version>5.3.5</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>5.3.5</version>
+        </dependency>
+        <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring5</artifactId>
             <version>3.0.11.RELEASE</version>
@@ -113,11 +118,6 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.10.Final</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>5.3.5</version>
-        </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
@@ -162,8 +162,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
-            <scope>provided</scope>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Java Logger Dependency -->
@@ -212,7 +212,6 @@
         <!--      <artifactId>bootstrap</artifactId>-->
         <!--      <version>3.3.5</version>-->
         <!--    </dependency>-->
-
     </dependencies>
 
     <build>

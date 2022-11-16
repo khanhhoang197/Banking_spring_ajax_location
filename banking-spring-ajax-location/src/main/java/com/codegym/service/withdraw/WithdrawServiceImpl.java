@@ -11,11 +11,14 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class WithdrawServiceImpl implements IWithdrawService{   @Autowired
-private WithdrawRepository withdrawRepository;
+public class WithdrawServiceImpl implements IWithdrawService {
+
+    @Autowired
+    private WithdrawRepository withdrawRepository;
+
     @Override
     public List<Withdraw> findAll() {
-        return withdrawRepository.findAll();
+        return null;
     }
 
     @Override
@@ -25,7 +28,7 @@ private WithdrawRepository withdrawRepository;
 
     @Override
     public Optional<Withdraw> findById(Long id) {
-        return withdrawRepository.findById(id);
+        return Optional.empty();
     }
 
     @Override

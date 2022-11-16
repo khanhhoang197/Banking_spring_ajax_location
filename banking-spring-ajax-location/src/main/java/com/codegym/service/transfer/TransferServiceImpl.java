@@ -1,8 +1,7 @@
 package com.codegym.service.transfer;
 
-
 import com.codegym.model.Transfer;
-
+import com.codegym.model.dto.TransferHistoryDTO;
 import com.codegym.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,14 +14,17 @@ import java.util.Optional;
 @Service
 @Transactional
 public class TransferServiceImpl implements ITransferService {
-
     @Autowired
     private TransferRepository transferRepository;
-
 
     @Override
     public List<Transfer> findAll() {
         return transferRepository.findAll();
+    }
+
+    @Override
+    public List<TransferHistoryDTO> getAllHistories() {
+        return transferRepository.getAllHistories();
     }
 
     @Override
@@ -32,22 +34,21 @@ public class TransferServiceImpl implements ITransferService {
 
     @Override
     public Optional<Transfer> findById(Long id) {
-        return transferRepository.findById(id);
+        return Optional.empty();
+    }
+
+    @Override
+    public BigDecimal getSumFeesAmount() {
+        return transferRepository.getSumFeesAmount();
     }
 
     @Override
     public Transfer save(Transfer transfer) {
-        return transferRepository.save(transfer);
+        return null;
     }
 
     @Override
     public void remove(Long id) {
 
-    }
-
-
-    @Override
-    public BigDecimal getSumFeesAmount() {
-        return null;
     }
 }
