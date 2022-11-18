@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/assets/css/style-login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+
+    <div class="form login" id="form">
+        <div class="content">
+            <h1>Login</h1>
+            <div class="group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="username-login" class="inputText" placeholder="&nbsp;" required>
+                <label for="username-login">Username</label>
+            </div>
+            <div class="group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="pass-login" class="inputText" placeholder="&nbsp;" required>
+                <label for="pass-login">Password</label>
+                <i class="eye-icon fa-solid fa-eye" onclick="showPass()" class="eye"></i>
+            </div>
+            <div class="group">
+                <input type="checkbox"> <p>Ghi nhớ đăng nhập</p>
+                <a href="#">Quên mật khẩu</a>
+            </div>
+            <button>Login</button>
+        </div>
+
+
+        <div class="content">
+            <h1>Register</h1>
+            <div class="group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="username-reg" class="inputText" placeholder="&nbsp;" required>
+                <label for="username-reg">Username</label>
+            </div>
+            <div class="group">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="text" id="email-reg" class="inputText" placeholder="&nbsp;" required>
+                <label for="email-reg">Email</label>
+            </div>
+            <div class="group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="pass-reg1" class="inputText" placeholder="&nbsp;" required>
+                <label for="pass-reg1">Password </label>
+                <i class="eye-icon fa-solid fa-eye" onclick="showPassReg1()" class="eye"></i>
+
+            </div>
+            <div class="group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="pass-reg2" class="inputText" placeholder="&nbsp;" required>
+                <label for="pass-reg2">Confirm Password</label>
+                <i class="eye-icon fa-solid fa-eye" onclick="showPassReg2()" class="eye"></i>
+
+            </div>
+            <button>Register</button>
+        </div>
+
+
+        <div class="form-rotate">
+            <div id="rotate"></div>
+        </div>
+    </div>
+    <div class="option">
+        <div class="bg-active" id="bg-active"></div>
+        <div class="changeType active" id="login">Login</div>
+        <div class="changeType" id="register">Register</div>
+    </div>
+</div>
+
+
+</body>
+<script>
+    let options = document.querySelectorAll('.changeType');
+    let form = document.getElementById('form');
+    let bgactive = document.getElementById('bg-active');
+    var rotatedeg = 0;
+
+    options.forEach(val => {
+        val.addEventListener('click', function(event){
+            if(this.classList.contains('active')){
+                return;
+            }
+            form.classList.remove('login');
+            form.classList.remove('register');
+            form.classList.add(this.id);
+            bgactive.style.left = this.offsetLeft + 'px';
+            options.forEach(item => {
+                item.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            rotatedeg = rotatedeg + 200;
+            document.getElementById('rotate').style.transform = 'translate(-50%) rotate(' + rotatedeg + 'deg)';
+        })
+    });
+
+    function showPass() {
+        let x = document.getElementById("pass-login");
+        if (x.type == "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+        let y = document.querySelector(".fa-eye");
+        y.classList.toggle("fa-eye-slash")
+    };
+    function showPassReg1() {
+        let x = document.getElementById("pass-reg1");
+        if (x.type == "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    };
+    function showPassReg2() {
+        let x = document.getElementById("pass-reg2");
+        if (x.type == "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    };
+
+</script>
+</html>

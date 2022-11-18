@@ -30,7 +30,7 @@
         <table id="tbCustomer" class="table table-hover">
             <thead>
             <tr>
-                <th class="text-center">#</th>
+                <th class="text-center">ID</th>
                 <th class="text-center">Full name</th>
                 <th class="text-center">Email</th>
                 <th class="text-center">Phone</th>
@@ -473,25 +473,27 @@
                 page.commands.removeHandleShowModal();
                 page.commands.handleShowGroupModal();
                 page.dialogs.elements.modalCreateCustomer.modal("hide");
-                Swal.fire(
-                    'Thành công',
-                    "Thêm mới khách hàng <b>'" + obj.fullName + "'</b> thành công.",
-                    'success'
-                )
-            })
-            .fail((jqXHR) => {
-                let errors = jqXHR.responseJSON;
-                if (errors) {
-                    let str = "";
-                    $.each(errors, (k, v) => {
-                        str += `
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Thành công',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                    .fail((jqXHR) => {
+                        let errors = jqXHR.responseJSON;
+                        if (errors) {
+                            let str = "";
+                            $.each(errors, (k, v) => {
+                                str += `
                             <label class="error" for="${k + 'Cre'}">${v}</label>
                         `;
+                            })
+                            page.dialogs.alertDanger.modalCreateCustomer.removeClass("hide").addClass("show");
+                            page.dialogs.alertDanger.modalCreateCustomer.css("display", "block")
+                            page.dialogs.alertDanger.modalCreateCustomer.append(str);
+                        }
                     })
-                    page.dialogs.alertDanger.modalCreateCustomer.removeClass("hide").addClass("show");
-                    page.dialogs.alertDanger.modalCreateCustomer.css("display", "block")
-                    page.dialogs.alertDanger.modalCreateCustomer.append(str);
-                }
             })
     }
     //END CREATE//
@@ -616,11 +618,13 @@
                 page.commands.handleShowGroupModal();
 
                 page.dialogs.elements.modalUpdateCustomer.modal("hide");
-                Swal.fire(
-                    'Thành công',
-                    "Chỉnh sửa khách hàng <b>'" + obj.fullName + "'</b> thành công.",
-                    'success'
-                )
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Chỉnh sửa khách hàng ' + obj.fullName + ' thành công',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -673,11 +677,13 @@
         })
             .done(() => {
                 $("#tr_" + customerId).remove();
-                Swal.fire(
-                    'Deleted!',
-                    "Xóa thành công khách hàng <b>'" + customer.fullName + "'</b>",
-                    'success'
-                )
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Xóa khách hàng ' + customer.fullName + ' thành công',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -691,7 +697,7 @@
                 }
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
+                    title: 'Lỗi...',
                     text: strError,
                 })
             })
@@ -779,12 +785,13 @@
                 page.commands.handleShowGroupModal();
 
                 page.dialogs.elements.modalDeposit.modal("hide");
-
-                Swal.fire(
-                    'Thành công',
-                    "Nạp <b>'" + obj.transactionAmount + "'</b> vnđ cho khách hàng <b>'" + customer.fullName + "'</b> thành công",
-                    'success'
-                )
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: "Nạp <b>" + obj.transactionAmount + "</b> vnđ cho khách hàng <b>" + customer.fullName + "</b> thành công",
+                    showConfirmButton: false,
+                    timer: 2500
+                })
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -858,7 +865,7 @@
                 if (+withdraw.transactionAmount > +data.balance) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
+                        title: 'Lỗi',
                         text: 'Số tiền muốn rút nhiều hơn số tiền hiện có',
                     })
                 } else {
@@ -893,12 +900,13 @@
                 page.commands.handleShowGroupModal();
 
                 page.dialogs.elements.modalWithdraw.modal("hide");
-
-                Swal.fire(
-                    'Thành công',
-                    "Rút <b>'" + obj.transactionAmount + "'</b> VNĐ của khách hàng <b>'" + customer.fullName + "'</b> thành công",
-                    'success'
-                )
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title:   "Rút <b>'" + obj.transactionAmount + "'</b> VNĐ của khách hàng <b>'" + customer.fullName + "'</b> thành công",
+                    showConfirmButton: false,
+                    timer: 2500
+                })
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -1007,7 +1015,7 @@
                             .catch(() => {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Oops...',
+                                    title: 'Lỗi...',
                                     text: 'ID người nhận không hợp lệ',
                                 })
                             });
@@ -1015,7 +1023,7 @@
                         .catch(() => {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Oops...',
+                                title: 'Lỗi...',
                                 text: 'ID người gửi không hợp lệ',
                             })
                         });
@@ -1054,11 +1062,14 @@
 
                 page.dialogs.alertDanger.modalTransfer.modal("hide");
 
-                Swal.fire(
-                    'Thành công',
-                    "Chuyển <b>'" + transferInput.transferAmount + "'</b> VNĐ từ khách hàng <b>'" + sender.fullName + "'</b> đến khách hàng <b>'" + recipient.fullName + "'</b> thành công!",
-                    'success'
-                )
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title:   "Chuyển <b>'" + transferInput.transferAmount + "'</b> VNĐ từ khách hàng <b>'" + sender.fullName + "'</b> đến khách hàng <b>'" + recipient.fullName + "'</b> thành công!",
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -1262,6 +1273,6 @@
     $(() => {
         page.commands.loadData();
         page.initializeEventControl();
-    });
+    })
 </script>
 </html>
