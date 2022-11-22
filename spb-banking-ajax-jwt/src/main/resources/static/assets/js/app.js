@@ -7,18 +7,22 @@ class App {
     static AUTH_URL = this.DOMAIN_SERVER + "/api/auth";
     static ROLE_API = this.DOMAIN_SERVER + "/api/roles";
     static PROVINCE_URL = "https://vapi.vnappmob.com/api/province/";
+    static ERROR_URL = this.DOMAIN_SERVER + "/error/";
+    static TRANSFER_URL = this.DOMAIN_SERVER + "/transfers";
 
+    static BASE_URL_CLOUD_IMAGE = "https://res.cloudinary.com/dg4kw5uuy/image/upload";
+    static BASE_SCALE_IMAGE = "c_limit,w_100,h_80,q_100";
 
     static SweetAlert = class {
         static showDeactivateConfirmDialog() {
             return Swal.fire({
                 icon: 'warning',
-                text: 'Are you sure to deactivate the selected customer ?',
+                text: 'Bạn có muốn xóa khách hàng này không ?',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, please deactivate this client !',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: 'Có. hãy xóa ngay !',
+                cancelButtonText: 'Hủy',
             })
         }
 
@@ -52,15 +56,23 @@ class App {
             Swal.fire({
                 icon: 'error',
                 title: 'Access Denied',
-                text: 'You are not authorized to perform this function!',
+                text: 'Bạn không được phép thực hiện chức năng này!',
             })
         }
 
-
-        static redirectPage(message1, message2, timer){
-            let timerInterval
+        static showError500() {
             Swal.fire({
-                title: message1,
+                icon: 'error',
+                title: 'Internal Server Error',
+                text: 'Hệ thống Server đang có vấn đề hoặc không truy cập được.',
+            })
+        }
+
+        static redirectPage(message1, message2, timer, url) {
+            let timerInterval;
+            Swal.fire({
+                icon: 'success',
+                title: "<br>" + message1,
                 html: message2,
                 timer: timer,
                 timerProgressBar: true,
@@ -72,7 +84,8 @@ class App {
                     }, 100)
                 },
                 willClose: () => {
-                    clearInterval(timerInterval)
+                    clearInterval(timerInterval);
+                    window.location.href = url;
                 }
             }).then((result) => {
                 /* Read more about handling dismissals below */
@@ -81,10 +94,11 @@ class App {
                 }
             })
         }
+
     }
 
     static IziToast = class {
-        static showSuccessAlert(m) {
+        static showSuccessAlertLeft(m) {
             iziToast.success({
                 title: 'OK',
                 position: 'topLeft',
@@ -93,10 +107,28 @@ class App {
             });
         }
 
-        static showErrorAlert(m) {
+        static showSuccessAlertRight(m) {
+            iziToast.success({
+                title: 'OK',
+                position: 'topRight',
+                timeout: 2500,
+                message: m
+            });
+        }
+
+        static showErrorAlertLeft(m) {
             iziToast.error({
                 title: 'Error',
                 position: 'topLeft',
+                timeout: 2500,
+                message: m
+            });
+        }
+
+        static showErrorAlertRight(m) {
+            iziToast.error({
+                title: 'Error',
+                position: 'topRight',
                 timeout: 2500,
                 message: m
             });
@@ -113,6 +145,27 @@ class App {
             $.notify(m, "error");
         }
     }
+
+    static formatNumber() {
+        $(".num-space").number(true, 0, ',', ' ')
+        $(".num-point").number(true, 0, ',', '.');
+        $(".num-comma").number(true, 0, ',', ',');
+    }
+
+    static formatNumberSpace(x) {
+        if (x == null) {
+            return x;
+        }
+        return x.toString().replace(/ /g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    static removeFormatNumberSpace(x) {
+        if (x == null) {
+            return x;
+        }
+        return x.toString().replace(/ /g, "")
+    }
+
 }
 
 
@@ -165,5 +218,18 @@ class Transfer {
         this.feesAmount = feesAmount;
         this.transactionAmount = transactionAmount;
         this.recipientId = recipientId;
+    }
+}
+
+class CustomerAvatar {
+    constructor(id, fileName, fileFolder, fileUrl, fileType, cloudId, ts, customer) {
+        this.id = id;
+        this.fileName = fileName;
+        this.fileFolder = fileFolder;
+        this.fileUrl = fileUrl;
+        this.fileType = fileType;
+        this.cloudId = cloudId;
+        this.ts = ts;
+        this.customer = customer;
     }
 }

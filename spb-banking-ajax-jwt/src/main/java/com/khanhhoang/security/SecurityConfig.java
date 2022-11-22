@@ -72,7 +72,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .antMatchers("/transfers").hasAnyAuthority("ADMIN")
                 .antMatchers("/resources/**", "/assets/**").permitAll()
-                .antMatchers("/resources/**", "/templates/**").permitAll()
                 .antMatchers(
                         "/v3/api-docs",
                         "/swagger-resources/configuration/ui",
@@ -100,6 +99,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
+
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling().accessDeniedPage("/error/403");
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.cors();

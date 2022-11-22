@@ -16,14 +16,14 @@ public class CustomerController {
     @Autowired
     private ICustomerService customerService;
 
-    @GetMapping
+    @GetMapping("")
     public ModelAndView showListPage() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("customer/list");
 
-        List<CustomerDTO> customers = customerService.getAllCustomerDTO();
-
-        modelAndView.addObject("customers", customers);
+//        List<CustomerDTO> customers = customerService.getAllCustomerDTO();
+//
+//        modelAndView.addObject("customers", customers);
 
         return modelAndView;
     }

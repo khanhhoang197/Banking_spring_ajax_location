@@ -6,15 +6,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/assets/izitoast/dist/css/iziToast.css">
-    <link rel="stylesheet" href="/assets/izitoast/dist/css/iziToast.min.css">
-    <link rel="stylesheet" href="/assets/izitoast/src/css/animations.styl">
-    <link rel="stylesheet" href="/assets/izitoast/src/css/layouts.styl">
-    <link rel="stylesheet" href="/assets/izitoast/src/css/style.styl">
-    <link rel="stylesheet" href="/assets/izitoast/src/css/themes.styl">
-    <link rel="stylesheet" href="/assets/izitoast/src/css/toast.styl">
+    <title>Banking ajax location</title>
     <link rel="stylesheet" href="/assets/sweetalert2/sweetalert2.min.css">
+    <link rel="stylesheet" href="/assets/iziToast/dist/css/iziToast.min.css">
+    <link rel="stylesheet" href="/assets/iziToast/dist/css/iziToast.css">
     <style>
         :root {
             --primary-color: #4EA685;
@@ -398,8 +393,10 @@
                         <label>Roles Group</label>
                     </div>
                     <div class="custom-options">
-                        <span class='custom-option' data-value='2'>Admin role</span>
-                        <span class='custom-option' data-value='1'>User role</span>
+                        <select name="role" id="role" class="form-select">
+                            <option value="2">Admin</option>
+                            <option value="1">User</option>
+                        </select>
                     </div>
                     <!-- <div class="input-group">
                         <i class='bx bxs-lock-alt'></i>
@@ -495,12 +492,10 @@
 </body>
 <script src="/assets/jquery/v3.6.1/jquery-3.6.1.min.js"></script>
 <script src="/assets/jquery-validate/1.19.3/jquery.validate-1.19.3.min.js"></script>
-<script src="/assets/js/validate.js"></script>
 <script src="/assets/js/app.js"></script>
-<script src="/assets/izitoast/dist/js/iziToast.js"></script>
-<script src="/assets/izitoast/dist/js/iziToast.min.js"></script>
-<script src="/assets/izitoast/src/js/iziToast.js"></script>
 <script src="/assets/sweetalert2/sweetalert2.min.js"></script>
+<script src="/assets/iziToast/dist/js/iziToast.min.js"></script>
+<script src="/assets/iziToast/dist/js/iziToast.js"></script>
 <script>
     let container = document.getElementById('container')
 
@@ -532,11 +527,14 @@
     page.elements.pwdReg = $("#pwdReg");
     page.elements.btnRegister = $("#btnRegister");
 
-    page.elements.roles = $("#rolesGroup");
+    page.elements.roles = $("#role");
+
+    page.elements.btnLogin.on("click", () => {
+        page.commands.login();
+    })
 
     page.commands.login = () => {
         let user = {
-            fullName: page.elements.fullNameReg.val(),
             username: page.elements.emailLogin.val(),
             password: page.elements.pwdLogin.val()
         }
@@ -548,38 +546,17 @@
             type: "POST",
             url: "http://localhost:8080/api/auth/login",
             data: JSON.stringify(user)
-        }).done((resp) => {
-            App.SweetAlert.redirectPage("Đăng nhập thành công.", "", 1500);
-
-            setTimeout(function () {
-                window.location.href = "/";
-            }, 1500);
-
-        }).fail(function () {
-            App.IziToast.showErrorAlert("Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại!");
-        });
-    }
-
-    page.commands.getRoles = () => {
-        return $.ajax({
-            headers: {
-                "accept": "application/json",
-                "content-type": "application/json"
-            },
-            type: "GET",
-            url: "http://localhost:8080/api/roles"
+        }).done((data) => {
+                window.location.href = "/customers";
         })
-            .done((data) => {
-                data.map(item => {
-                    let str = `<option value="${item.id}">${item.code}</option>`;
-                    page.elements.roles.append(str);
-                })
-            })
-            .fail((error) => {
-                console.log(error);
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert("Rất tiếc thông tin truyền không đúng ??");
             })
     }
 
+    page.elements.btnRegister.on("click", () => {
+        page.commands.register();
+    })
     page.commands.register = () => {
         let user = {
             fullName: page.elements.fullNameReg.val(),
@@ -598,32 +575,13 @@
             },
             url: "http://localhost:8080/api/auth/register",
             data: JSON.stringify(user)
-        }).done((resp) => {
+        }).done((data) => {
+            $('#emailLogin').val($('#emailReg').val());
+            $('#pwdLogin').val($('#pwdReg').val());
+        }).fail((jqXHR) => {
 
-            setTimeout();
-        }).fail(function (jqXHR) {
-            if (jqXHR.responseJSON) {
-                if (jqXHR.responseJSON.message) {
-                    App.Notify.showErrorAlert(jqXHR.responseJSON.message);
-                } else {
-                    $.each(jqXHR.responseJSON, function (key, value) {
-                        App.Notify.showErrorAlert(value);
-                    });
-                }
-            } else {
-                App.Notify.showErrorAlert("Something went wrong, please try again");
-            }
         });
     }
-
-
-    page.elements.btnLogin.on("click", () => {
-        page.commands.login();
-    })
-
-    page.elements.btnRegister.on("click", () => {
-        page.commands.register();
-    })
 
 
     page.commands.loadData = () => {
@@ -631,13 +589,7 @@
     }
 
     page.initializeEventControl = () => {
-        page.elements.btnLogin.on("click", () => {
-            page.commands.login();
 
-        })
-        page.elements.btnRegister.on("click", () => {
-            page.commands.register();
-        })
     }
 
     $(() => {
