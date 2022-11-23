@@ -42,6 +42,7 @@
             <thead>
             <tr>
                 <th class="text-center">#</th>
+                <th class="text-center">Image</th>
                 <th class="text-center">Full name</th>
                 <th class="text-center">Email</th>
                 <th class="text-center">Phone</th>
@@ -92,7 +93,9 @@
             transfer: App.TRANSFER_API,
             getAllProvinces: App.PROVINCE_URL,
             getAllDistrictsByProvinceId: App.PROVINCE_URL + "district/",
-            getAllWardsByDistrictId: App.PROVINCE_URL + "ward/"
+            getAllWardsByDistrictId: App.PROVINCE_URL + "ward/",
+            transfer_url: App.TRANSFER_URL,
+            getCustomerAvatarById: App.CUSTOMER_AVATAR_URL
         },
         elements: {},
         loadData: {},
@@ -168,11 +171,33 @@
     page.dialogs.alertDanger.modalWithdraw = $("#modalWithdraw .modal-body .modal-alert-danger");
     page.dialogs.alertDanger.modalTransfer = $("#modalTransfer .modal-body .modal-alert-danger");
 
+    page.dialogs.elements.wrapperCre = $("#frmCreateCustomer section .wrapper");
+    page.dialogs.elements.imageFileCre = $("#imageFileCre");
+    page.dialogs.elements.wrapperContentCre = $("#frmCreateCustomer section .wrapper .content");
+    page.dialogs.elements.imagePreviewCre = $("#frmCreateCustomer section .image-preview canvas");
+    page.dialogs.elements.canvasCre = $("#canvasCre");
+    page.dialogs.elements.contextCre = page.dialogs.elements.canvasCre[0].getContext('2d');
+    page.dialogs.elements.imagePreviewCre.css("display", "none");
+    page.dialogs.elements.divImagePreviewCre = $("#frmCreateCustomer div.image-preview,#frmCreateCustomer div.file-name");
+
+    page.dialogs.elements.wrapperUp = $("#frmUpdateCustomer section .wrapper");
+    page.dialogs.elements.imageFileUp = $("#imageFileUp");
+    page.dialogs.elements.wrapperContentUp = $("#frmUpdateCustomer section .wrapper .content");
+    page.dialogs.elements.imagePreviewUp = $("#frmUpdateCustomer section .image-preview canvas");
+    page.dialogs.elements.canvasUp = $("#canvasUp");
+    page.dialogs.elements.contextUp = page.dialogs.elements.canvasUp[0].getContext('2d');
+    page.dialogs.elements.imagePreviewUp.css("display", "none");
+    page.dialogs.elements.divImagePreviewUp = $("#frmUpdateCustomer div.image-preview, #frmUpdateCustomer div.file-name");
+
+
     let customer = new Customer();
     let locationRegion = new LocationRegion();
     let deposit = new Deposit();
     let withdraw = new Withdraw();
     let transfer = new Transfer();
+    let customerAvatar = new CustomerAvatar();
+    let senderAvatar = new CustomerAvatar();
+    let recipientAvatar = new CustomerAvatar();
 
 
         $(document).on('input', '.num-space', function (e) {
@@ -206,22 +231,32 @@
             })
     }
 
-    page.commands.renderCustomer = (obj, locationRegion) => {
+    page.commands.renderCustomer = (obj, customer, locationRegion) => {
+        let image_thumbnail = App.BASE_URL_CLOUD_IMAGE + "/" + App.SCALE_IMAGE_W100_H80_Q100 + "/" + obj.fileFolder + "/" + obj.fileName;
         return `
-                <tr id="tr_${obj.id}">
-                    <td>${obj.id}</td>
-                    <td>${obj.fullName}</td>
-                    <td>${obj.email}</td>
-                    <td>${obj.phone}</td>
+                <tr id="tr_${customer.id}">
+                    <td>${customer.id}</td>
+                    <td>
+                        <img src=${image_thumbnail} alt="${obj.id}">
+                    </td>
+                    <td>${customer.fullName}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
                     <td class="text-end">
-                            ${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(obj.balance)}
+                            ${new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(customer.balance)}
                     </td>
                      <td>${locationRegion.provinceName}</td>
                     <td>${locationRegion.districtName}</td>
                     <td>${locationRegion.wardName}</td>
                     <td>${locationRegion.address}</td>
                     <td class="text-center">
-                        <button data-id="${obj.id}"
+                        <button data-id="${customer.id}"
+                                data-avatar-id = "${obj.id}"
+                                data-avatar-file-folder = "${obj.fileFolder}"
+                                data-avatar-file-name = "${obj.fileName}"
                                 class="btn btn btn-outline-dark update"
                                 title="Edit"
                                 data-toggle="tooltip"
@@ -233,7 +268,7 @@
                         </button>
                     </td>
                     <td>
-                        <button data-id="${obj.id}"
+                        <button data-id="${customer.id}"
                                 class="btn btn-outline-success deposit"
                                 title="Deposit"
                                 data-toggle="tooltip"
@@ -243,7 +278,7 @@
                         </button>
                     </td>
                     <td>
-                        <button data-id="${obj.id}"
+                        <button data-id="${customer.id}"
                                 class="btn btn-outline-warning withdraw"
                                 title="Withdraw"
                                 data-toggle="tooltip"
@@ -253,7 +288,7 @@
                         </button>
                     </td>
                     <td>
-                        <button data-id="${obj.id}"
+                        <button data-id="${customer.id}"
                                 class="btn btn-outline-info transfer"
                                 title="Transfer"
                                 data-toggle="tooltip"
@@ -263,7 +298,7 @@
                         </button>
                     </td>
                     <td>
-                          <button data-id="${obj.id}"
+                          <button data-id="${customer.id}"
                                 class="btn btn-outline-danger delete"
                                 title="Suspended"
                                 data-toggle="tooltip"
@@ -276,6 +311,104 @@
             `;
     }
     // END SHOW //
+
+    //-Load image Update-//
+    page.dialogs.commands.loadImageToCanvasUp = (imageFile, fileType, imageUrl) => {
+        page.dialogs.elements.imagePreviewUp.css("display", "");
+        page.dialogs.elements.wrapperUp.addClass("active");
+        page.dialogs.elements.wrapperContentUp.css("opacity", 0);
+
+        let imageObj = new Image();
+
+        imageObj.onload = function () {
+            page.dialogs.elements.contextUp.canvas.width = imageObj.width;
+            page.dialogs.elements.contextUp.canvas.height = imageObj.height;
+            page.dialogs.elements.contextUp.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+        };
+        if (fileType === "BINARY") {
+            imageObj.src = URL.createObjectURL(imageFile);
+        } else {
+            imageObj.src = imageUrl;
+        }
+    }
+
+    page.dialogs.commands.changeImagePreviewUp = () => {
+        let imageFile = page.dialogs.elements.imageFileUp[0].files[0];
+
+        if (imageFile) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(imageFile);
+
+            reader.onload = function (e) {
+                if (e.target.readyState === FileReader.DONE) {
+                    page.dialogs.commands.loadImageToCanvasUp(imageFile, "BINARY", null);
+                }
+            }
+        } else {
+            page.dialogs.elements.clearImagePreviewUp();
+        }
+    }
+
+    page.dialogs.elements.clearImagePreviewUp = () => {
+        page.dialogs.elements.imageFileUp.val("");
+        page.dialogs.elements.imagePreviewUp.css("display", "none");
+        page.dialogs.elements.wrapperUp.removeClass("active");
+        page.dialogs.elements.wrapperContentUp.css("opacity", 1);
+    }
+    //--//
+
+    //-Load image Create-//
+    page.dialogs.commands.loadImageToCanvasCre = (imageFile) => {
+        page.dialogs.elements.imagePreviewCre.css("display", "");
+        page.dialogs.elements.wrapperCre.addClass("active");
+        page.dialogs.elements.wrapperContentCre.css("opacity", 0);
+
+        let imageObj = new Image();
+
+        imageObj.onload = function () {
+            page.dialogs.elements.contextCre.canvas.width = imageObj.width;
+            page.dialogs.elements.contextCre.canvas.height = imageObj.height;
+            page.dialogs.elements.contextCre.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+        };
+
+        imageObj.src = URL.createObjectURL(imageFile)
+    }
+
+    page.dialogs.commands.changeImagePreviewCre = () => {
+        let imageFile = page.dialogs.elements.imageFileCre[0].files[0];
+
+        if (imageFile) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(imageFile);
+
+            reader.onload = function (e) {
+                if (e.target.readyState === FileReader.DONE) {
+                    page.dialogs.commands.loadImageToCanvasCre(imageFile);
+                }
+            }
+        } else {
+            page.dialogs.elements.clearImagePreviewCre();
+        }
+    }
+
+    page.dialogs.elements.clearImagePreviewCre = () => {
+        page.dialogs.elements.imageFileCre.val("");
+        page.dialogs.elements.imagePreviewCre.css("display", "none");
+        page.dialogs.elements.wrapperCre.removeClass("active");
+        page.dialogs.elements.wrapperContentCre.css("opacity", 1);
+    }
+
+    page.dialogs.elements.clearImagePreviewUp = () => {
+        page.dialogs.elements.imageFileUp.val("");
+        page.dialogs.elements.imagePreviewUp.css("display", "none");
+        page.dialogs.elements.wrapperUp.removeClass("active");
+        page.dialogs.elements.wrapperContentUp.css("opacity", 1);
+    }
+    //--//
+
+
 
     //--------//
     page.commands.getAllProvinces = () => {
@@ -417,7 +550,7 @@
                 email: true
             },
             phoneCre: {
-                phone_valid: true,
+                // phone_valid: true,
                 required: true,
             }
         },
@@ -425,21 +558,21 @@
             fullNameCre: {
                 required: "Vui lòng nhập tên đầy đủ",
                 minlength: "Độ dài tối thiểu là 5 ký tự",
-                maxlength: "Độ dài tối đa là 100 ký tự"
+                maxlength: "Độ dài tối đa là 50 ký tự"
             },
             emailCre: {
                 required: "Vui lòng nhập email đầy đủ",
                 minlength: "Độ dài tối thiểu là 5 ký tự",
-                maxlength: "Độ dài tối đa là 100 ký tự",
+                maxlength: "Độ dài tối đa là 50 ký tự",
                 email: "Định dạng email không đúng"
             },
             phoneCre: {
-                phone_valid: "Định dạng số điện thoại không đúng",
+                // phone_valid: "Định dạng số điện thoại không đúng",
                 required: "Vui lòng nhập số điện thoại đầy đủ"
             }
         },
         errorLabelContainer: "#modalCreateCustomer .modal-body .modal-alert-danger",
-        errorPlacement: function (error, element) {
+        errorPlacement: function (error) {
             error.appendTo("#modalCreateCustomer .modal-body .modal-alert-danger");
         },
         showErrors: function () {
@@ -452,7 +585,6 @@
             this.defaultShowErrors();
         },
         submitHandler: function () {
-            // locationRegion.id = null;
             locationRegion.provinceId = page.dialogs.elements.provinceCre.val();
             locationRegion.provinceName = page.dialogs.elements.provinceCre.find("option:selected").text();
             locationRegion.districtId = page.dialogs.elements.districtCre.val();
@@ -461,41 +593,50 @@
             locationRegion.wardName = page.dialogs.elements.wardCre.find("option:selected").text();
             locationRegion.address = page.dialogs.elements.addressCre.val();
 
-            // customer.id = null;
             customer.fullName = page.dialogs.elements.fullNameCre.val();
             customer.email = page.dialogs.elements.emailCre.val();
             customer.phone = page.dialogs.elements.phoneCre.val();
             customer.balance = 0;
             customer.locationRegion = locationRegion;
-            page.commands.createCustomer(customer);
+
+            let formData = new FormData();
+            formData.append("fullName", customer.fullName);
+            formData.append("email", customer.email);
+            formData.append("phone", customer.phone);
+            formData.append("balance", customer.balance);
+            formData.append("provinceId", locationRegion.provinceId);
+            formData.append("provinceName", locationRegion.provinceName);
+            formData.append("districtId", locationRegion.districtId);
+            formData.append("districtName", locationRegion.districtName);
+            formData.append("wardId", locationRegion.wardId);
+            formData.append("wardName", locationRegion.wardName);
+            formData.append("address", locationRegion.address);
+            formData.append("file", page.dialogs.elements.imageFileCre[0].files[0]);
+
+            page.commands.createCustomer(formData);
         }
     })
 
-    page.commands.createCustomer = (obj) => {
+    page.commands.createCustomer = (formData) => {
+        page.commands.showLoading();
         $.ajax({
-            headers: {
-                "accept": "application/json",
-                "content-type": "application/json"
-            },
             type: "POST",
+            contentType: false,
+            cache: false,
+            processData: false,
             url: page.urls.createCustomer,
-            data: JSON.stringify(obj)
+            data: formData
         })
             .done((data) => {
-                customer = data;
+                customerAvatar = data;
+                customer = customerAvatar.customer;
                 locationRegion = customer.locationRegion;
-                let str = page.commands.renderCustomer(customer, locationRegion);
+                let str = page.commands.renderCustomer(customerAvatar, customer, locationRegion);
                 page.elements.tbCustomerBody.prepend(str);
                 page.commands.removeHandleShowModal();
                 page.commands.handleShowGroupModal();
                 page.dialogs.elements.modalCreateCustomer.modal("hide");
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: "Thêm mới khách hàng <b>'" + obj.fullName + "'</b> thành công.",
-                    showConfirmButton: false,
-                    timer: 1500
-                })
+                App.IziToast.showSuccessAlertLeft("Thêm mới khách hàng thành công.");
             })
             .fail((jqXHR) => {
                 let errors = jqXHR.responseJSON;
@@ -510,15 +651,42 @@
                     page.dialogs.alertDanger.modalCreateCustomer.css("display", "")
                     page.dialogs.alertDanger.modalCreateCustomer.append(str);
                 }
-            })
+            }).always(function () {
+            page.commands.closeLoading();
+        });
     }
     //END CREATE//
+
+    page.commands.showLoading = () => {
+        page.elements.loader.removeClass("hide");
+        page.dialogs.elements.btnCreate.prop('disabled', true);
+        page.dialogs.elements.btnUpdate.prop('disabled', true);
+        page.dialogs.elements.btnDeposit.prop('disabled', true);
+        page.dialogs.elements.btnWithdraw.prop('disabled', true);
+        page.dialogs.elements.btnTransfer.prop('disabled', true);
+    }
+
+    page.commands.closeLoading = () => {
+        page.elements.loader.addClass("hide");
+        page.dialogs.elements.btnCreate.prop('disabled', false);
+        page.dialogs.elements.btnUpdate.prop('disabled', false);
+        page.dialogs.elements.btnDeposit.prop('disabled', false);
+        page.dialogs.elements.btnWithdraw.prop('disabled', false);
+        page.dialogs.elements.btnTransfer.prop('disabled', false);
+    }
+
 
     // UPDATE CUSTOMER //
     page.commands.handleShowUpdateModal = () => {
         $(".update").on("click", function () {
             let id = $(this).data("id");
+            let avatarFileFolder = $(this).data("avatar-file-folder");
+            let avatarFileName = $(this).data("avatar-file-name");
             page.commands.getCustomerById(id).done((data) => {
+
+                let avatarUrl = App.BASE_URL_CLOUD_IMAGE + "/" + App.SCALE_IMAGE_W600_H650_Q100 + "/" + avatarFileFolder + "/" + avatarFileName;
+                page.dialogs.commands.loadImageToCanvasUp(null, "", avatarUrl);
+
                 customer = data;
                 locationRegion = customer.locationRegion;
                 page.dialogs.elements.customerIdUp.val(id);
@@ -558,7 +726,7 @@
                 email: true
             },
             phoneUp: {
-                phone_valid: true,
+                // phone_valid: true,
                 required: true,
             }
         },
@@ -566,7 +734,7 @@
             fullNameUp: {
                 required: "Vui lòng nhập tên đầy đủ",
                 minlength: "Độ dài tối thiểu là 5 ký tự",
-                maxlength: "Độ dài tối đa là 100 ký tự"
+                maxlength: "Độ dài tối đa là 50 ký tự"
             },
             emailUp: {
                 required: "Vui lòng nhập email đầy đủ",
@@ -575,7 +743,7 @@
                 email: "Định dạng email không đúng"
             },
             phoneUp: {
-                phone_valid: "Định dạng số điện thoại không đúng",
+                // phone_valid: "Định dạng số điện thoại không đúng",
                 required: "Vui lòng nhập số điện thoại đầy đủ"
             }
         },
@@ -598,6 +766,7 @@
             customer.email = page.dialogs.elements.emailUp.val();
             customer.phone = page.dialogs.elements.phoneUp.val();
 
+
             locationRegion.id = page.dialogs.elements.locationRegionIdUp.val();
             locationRegion.provinceId = page.dialogs.elements.provinceUp.val();
             locationRegion.provinceName = page.dialogs.elements.provinceUp.find("option:selected").text();
@@ -607,54 +776,81 @@
             locationRegion.wardName = page.dialogs.elements.wardUp.find("option:selected").text();
             locationRegion.address = page.dialogs.elements.addressUp.val();
 
-            customer.locationRegion = locationRegion;
-            page.commands.doUpdateCustomer(customer);
+            let formData = new FormData();
+            formData.append("id", customer.id);
+            formData.append("fullName", customer.fullName);
+            formData.append("email", customer.email);
+            formData.append("phone", customer.phone);
+            formData.append("balance", customer.balance);
+
+            formData.append("locationId", locationRegion.id);
+            formData.append("provinceId", locationRegion.provinceId);
+            formData.append("provinceName", locationRegion.provinceName);
+            formData.append("districtId", locationRegion.districtId);
+            formData.append("districtName", locationRegion.districtName);
+            formData.append("wardId", locationRegion.wardId);
+            formData.append("wardName", locationRegion.wardName);
+            formData.append("address", locationRegion.address);
+
+            formData.append("file", page.dialogs.elements.imageFileUp[0].files[0]);
+            page.commands.doUpdateCustomer(formData);
         }
     })
 
-    page.commands.doUpdateCustomer = (obj) => {
+    page.commands.doUpdateCustomer = (formData) => {
+        page.commands.showLoading();
         $.ajax({
-            headers: {
-                "accept": "application/json",
-                "content-type": "application/json"
-            },
             type: "PATCH",
-            url: page.urls.updateCustomer + "/" + obj.id,
-            data: JSON.stringify(obj)
+            contentType: false,
+            cache: false,
+            processData: false,
+            url: page.urls.updateCustomer + "/" + customer.id,
+            data: formData
         })
             .done((data) => {
-                customer = data;
+                customerAvatar = data;
+                customer = customerAvatar.customer;
                 locationRegion = customer.locationRegion;
-                let str = page.commands.renderCustomer(customer, locationRegion);
-                let updateRow = $("#tr_" + obj.id);
+                let str = page.commands.renderCustomer(customerAvatar, customer, locationRegion);
+                let updateRow = $("#tr_" + customer.id);
                 updateRow.replaceWith(str);
 
                 page.commands.enableTooltip();
                 page.commands.removeHandleShowModal();
                 page.commands.handleShowGroupModal();
-
                 page.dialogs.elements.modalUpdateCustomer.modal("hide");
-                iziToast.success({
-                    title: 'OK',
-                    position: 'topRight',
-                    timeout: 2500,
-                    message: "Chỉnh sửa khách hàng <b>'" + obj.fullName + "'</b> thành công.",
-                });
-            })
-            .fail((jqXHR) => {
-                let errors = jqXHR.responseJSON;
-                if (errors) {
-                    let str = "";
-                    $.each(errors, (k, v) => {
-                        str += `
-                            <label class="error" for="${k + 'Up'}">${v}</label>
-                        `;
-                    })
-                    page.dialogs.alertDanger.modalUpdateCustomer.removeClass("hide").addClass("show");
-                    page.dialogs.alertDanger.modalUpdateCustomer.css("display", "block")
-                    page.dialogs.alertDanger.modalUpdateCustomer.append(str);
+
+                App.IziToast.showSuccessAlertLeft("Chỉnh sửa khách hàng thành công.")
+            }).fail((jqXHR) => {
+            let str = ``;
+            console.log(jqXHR.status);
+            if (jqXHR.status === 401) {
+                App.SweetAlert.showError401();
+            } else {
+                if (jqXHR.status === 403) {
+
+                    App.SweetAlert.showError403();
+                } else {
+                    if (jqXHR.responseJSON) {
+                        if (jqXHR.responseJSON.message) {
+                            str += `<label id="message-error" class="error" for="message">${jqXHR.responseJSON.message}</label>`;
+                        } else {
+                            $.each(jqXHR.responseJSON, function (key, value) {
+                                str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
+                                $("#" + key + "Up").addClass("error");
+                            });
+                            page.dialogs.alertDanger.modalUpdateCustomer.removeClass("hide").addClass("show");
+                            page.dialogs.alertDanger.modalUpdateCustomer.css("display", "block")
+                            page.dialogs.alertDanger.modalUpdateCustomer.append(str);
+                        }
+                    } else {
+                        App.SweetAlert.showError500();
+                    }
                 }
-            })
+            }
+        }).always(function () {
+            page.commands.closeLoading();
+        })
     }
     //END UPDATE//
 
@@ -1158,6 +1354,33 @@
             })
     }
     //--- END UPDATE BALANCE ---//
+
+
+    //---GET CUSTOMER AVATAR BY CUSTOMER ID--//
+    page.commands.getCustomerAvatarByCustomerId = (customerId) => {
+        return $.ajax({
+            type: "GET",
+            url: page.urls.getCustomerAvatarById + "/" + customerId
+        }).done((data) => {
+            customerAvatar = data;
+            console.log(customerAvatar);
+        })
+            .fail((jqXHR) => {
+                let errors = jqXHR.responseJSON;
+                let strError = "";
+                if (errors) {
+                    $.each(errors, (k, v) => {
+                        strError += `${v}`;
+                    })
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: strError,
+                })
+            })
+    }
+    //--END--//
 
     //--- FIND BY ID ---//
     page.commands.getCustomerById = (customerId) => {

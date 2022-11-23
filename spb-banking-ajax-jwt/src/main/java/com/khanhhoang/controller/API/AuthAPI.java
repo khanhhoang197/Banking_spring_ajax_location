@@ -79,46 +79,6 @@ public class AuthAPI {
         }
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
-//        try {
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername(), userLoginDTO.getPassword()));
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            String jwt = jwtService.generateTokenLogin(authentication);
-//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//            User currentUser = userService.getByUsername(userLoginDTO.getUsername());
-//
-//            JwtResponse jwtResponse = new JwtResponse(
-//                    jwt,
-//                    currentUser.getId(),
-//                    userDetails.getUsername(),
-//                    currentUser.getUsername(),
-//                    userDetails.getAuthorities()
-//            );
-//
-//            ResponseCookie springCookie = ResponseCookie.from("JWT", jwt)
-//                    .httpOnly(false)
-//                    .secure(false)
-//                    .path("/")
-//                    .maxAge(60 * 1000)
-//                    .domain("localhost")
-//                    .build();
-//
-//            System.out.println(jwtResponse);
-//
-//            return ResponseEntity
-//                    .ok()
-//                    .header(HttpHeaders.SET_COOKIE, springCookie.toString())
-//                    .body(jwtResponse);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//    }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
